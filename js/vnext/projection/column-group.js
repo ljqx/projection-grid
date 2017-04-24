@@ -149,7 +149,6 @@ function normalizeSortable(sortable, column) {
  */
 class ColumnGroup {
   constructor(columns) {
-
     /**
      * The column header rows
      * @type {RowContent[]}
@@ -273,9 +272,10 @@ class ColumnGroup {
   }
 }
 
-function translateColumnGroup(columnGroup) {
+function translateColumnGroup(columnGroup, { name } = {}) {
   return _.map(columnGroup.leafColumns, col => {
-    const colClasses = _.union(normalizeClasses(col.colClasses, col), [`col-${col.name}`]);
+    const sortingClasses = name === col.name ? ['col-sorting'] : [];
+    const colClasses = _.union(normalizeClasses(col.colClasses, col), [`col-${col.name}`], sortingClasses);
     const colAttributes = normalizeAttributes(col.colAttributes, col);
     /**
      * The content of a `COL` element in `COLGROUP`.
@@ -302,11 +302,11 @@ function translateColumnGroup(columnGroup) {
  *    The input content chain state.
  * @return {ContentChainState}
  */
-function columnGroupProjectionHandler(state) {
+function columnGroupProjectionHandler(state, { sortableHeader } = {}) {
   const columnGroup = new ColumnGroup(state.columns || []);
   return _.defaults({
     columnGroup,
-    cols: translateColumnGroup(columnGroup),
+    cols: translateColumnGroup(columnGroup, sortableHeader),
   }, state);
 }
 
